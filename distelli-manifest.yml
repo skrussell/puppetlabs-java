@@ -1,48 +1,48 @@
-hunter/puppetlabs-java:
-  #Learn about the distelli-manifest.yml at https://www.distelli.com/docs/reference/distelli-manifest
-  PkgInclude:
-    - '*'
-    #- lib/simplerubyapp/*.rb
-    #- Gemfile
-    #- config.ru
-    #- SimpleRubyApp.gemspec
-
-  Build:
-    - export PUPPET_GEM_VERSION="~> 5.0"
-    - source ~/.rvm/scripts/rvm
-    - rvm install ruby-2.4.1 || true
-    - rvm use 2.4.1
-    - gem install bundler --without system_tests
-    - if [[ -f Gemfile ]]; then
-    -    if [[ -f Gemfile.lock ]]; then
-    -      bundle install --jobs=3 --retry=3 --deployment
-    -    else
-    -      bundle install --jobs=3 --retry=3
-    -    fi
-    - fi
-    - if [[ -f Gemfile ]]; then
-    -    bundle exec rake spec
-    - else
-    -   rake spec
-    - fi
-
-  PreInstall:
-    - echo "Begin PreInstall"
-    #- gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-    #- curl -sSL https://get.rvm.io | bash -s stable --ruby
-    #- source ~/.rvm/scripts/rvm
-    #- rvm install ruby-1.9.3
-    #- rvm use 1.9.3
-    #- gem install bundle
-
-  PostInstall:
-    - echo "Begin PostInstall"
-    #- source ~/.rvm/scripts/rvm
-    #- rvm use 1.9.3
-    #- bundle install --binstubs $DISTELLI_APPHOME/bundle/bin --standalone --path $DISTELLI_APPHOME/bundle/lib
-
-  Exec:
-    #- source ~/.rvm/scripts/rvm
-    #- rvm use 1.9.3
-    #- ./bundle/bin/thin start -p $PORT -e $STAGE
-
+puppetmodules/puppetlabs-java:
+  BuildWith: Travis
+#  #Learn about the distelli-manifest.yml at https://www.distelli.com/docs/reference/distelli-manifest
+#  PkgInclude:
+#    - '*'
+#    #- lib/simplerubyapp/*.rb
+#    #- Gemfile
+#    #- config.ru
+#    #- SimpleRubyApp.gemspec
+#
+#  Build:
+#    - export PUPPET_GEM_VERSION="~> 5.0"
+#    - source ~/.rvm/scripts/rvm
+#    - rvm install ruby-2.4.1 || true
+#    - rvm use 2.4.1
+#    - gem install bundler --without system_tests
+#    - if [[ -f Gemfile ]]; then
+#    -    if [[ -f Gemfile.lock ]]; then
+#    -      bundle install --jobs=3 --retry=3 --deployment
+#    -    else
+#    -      bundle install --jobs=3 --retry=3
+#    -    fi
+#    - fi
+#    - if [[ -f Gemfile ]]; then
+#    -    bundle exec rake spec
+#    - else
+#    -   rake spec
+#    - fi
+#
+#  PreInstall:
+#    - echo "Begin PreInstall"
+#    #- gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+#    #- curl -sSL https://get.rvm.io | bash -s stable --ruby
+#    #- source ~/.rvm/scripts/rvm
+#    #- rvm install ruby-1.9.3
+#    #- rvm use 1.9.3
+#    #- gem install bundle
+#
+#  PostInstall:
+#    - echo "Begin PostInstall"
+#    #- source ~/.rvm/scripts/rvm
+#    #- rvm use 1.9.3
+#    #- bundle install --binstubs $DISTELLI_APPHOME/bundle/bin --standalone --path $DISTELLI_APPHOME/bundle/lib
+#
+#  Exec:
+#    #- source ~/.rvm/scripts/rvm
+#    #- rvm use 1.9.3
+#    #- ./bundle/bin/thin start -p $PORT -e $STAGE
