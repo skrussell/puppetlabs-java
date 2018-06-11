@@ -167,7 +167,7 @@ define java::oracle (
           if $release_major =~ /(\d+)u(\d+)/ {
 	        if ($1 == '8' and Integer($2) >= 172) {
               $path_suffix = $facts['os']['architecture'] ? {
-                'x84_64' => '-amd64',
+                'x86_64' => '-amd64',
                 default  => "-${facts['os']['architecture']}"
               }
             } else {
