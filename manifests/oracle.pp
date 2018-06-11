@@ -164,7 +164,16 @@ define java::oracle (
           } else {
             $package_type = 'rpm'
           }
-          $creates_path = "/usr/java/${install_path}"
+          if $release_major =~ /(\d+)u(\d+)/ {
+	        if ($1 == '8' and Integer($2) >= 172) {
+              $path_suffix = "-${facts['os']['architecture']}"
+            } else {
+              $path_suffix = ''
+            }
+          } else {
+            $path_suffix = ''
+          }
+          $creates_path = "/usr/java/${install_path}${path_suffix}"
         }
         'Debian' : {
             $package_type = 'tar.gz'
