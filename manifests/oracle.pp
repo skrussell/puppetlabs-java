@@ -252,10 +252,16 @@ define java::oracle (
       $package_name = "${java_se}-${release_major}-${os}-${arch}-rpm.bin"
     }
     'rpm' : {
-      $package_name = "${java_se}-${release_major}-${os}-${arch}.rpm"
+      $package_name = $version ? {
+        '11'    => "${java_se}-${release_major}-${os}-${arch}_bin.rpm",
+        default => "${java_se}-${release_major}-${os}-${arch}.rpm"
+      }
     }
     'tar.gz' : {
-      $package_name = "${java_se}-${release_major}-${os}-${arch}.tar.gz"
+      $package_name = $version ? {
+        '11'    => "${java_se}-${release_major}-${os}-${arch}_bin.tar.gz"
+        default => "${java_se}-${release_major}-${os}-${arch}.tar.gz"
+      }
     }
     default : {
       $package_name = "${java_se}-${release_major}-${os}-${arch}.rpm"
