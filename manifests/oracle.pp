@@ -259,7 +259,7 @@ define java::oracle (
     }
     'tar.gz' : {
       $package_name = $version ? {
-        '11'    => "${java_se}-${release_major}-${os}-${arch}_bin.tar.gz"
+        '11'    => "${java_se}-${release_major}-${os}-${arch}_bin.tar.gz",
         default => "${java_se}-${release_major}-${os}-${arch}.tar.gz"
       }
     }
