@@ -9,8 +9,8 @@
 # uses the following to download the package and automatically accept
 # the licensing terms.
 # wget --no-cookies --no-check-certificate --header \
-# "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
-# "http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz"
+# "Cookie: gpw_e24=https%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
+# "https://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz"
 #
 # Parameters
 # [*version*]
@@ -99,7 +99,7 @@ define java::oracle (
   $version_major = undef,
   $version_minor = undef,
   $java_se       = 'jdk',
-  $oracle_url    = 'http://download.oracle.com/otn-pub/java/jdk/',
+  $oracle_url    = 'https://download.oracle.com/otn-pub/java/jdk/',
   $proxy_server  = undef,
   $proxy_type    = undef,
   $url           = undef,
@@ -117,9 +117,9 @@ define java::oracle (
 
   if $jce {
     $jce_download = $version ? {
-      '8'     => 'http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip',
-      '7'     => 'http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip',
-      '6'     => 'http://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip',
+      '8'     => 'https://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip',
+      '7'     => 'https://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip',
+      '6'     => 'https://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip',
       default => undef
     }
   }
@@ -140,7 +140,11 @@ define java::oracle (
         $install_path = "${java_se}1.${1}.0_${2}"
       }
     } else {
-      $install_path = "${java_se}${release_major}${release_minor}"
+      if ($version == '11') {
+        $install_path = "${java_se}-${release_major}"
+      } else {
+        $install_path = "${java_se}${release_major}${release_minor}"
+      }
     }
   } else {
     # use default versions if no specific major and minor version parameters are provided
@@ -148,25 +152,31 @@ define java::oracle (
       '6' : {
         $release_major = '6u45'
         $release_minor = 'b06'
-        $install_path = "${java_se}1.6.0_45"
+        $install_path  = "${java_se}1.6.0_45"
         $release_hash  = undef
       }
       '7' : {
         $release_major = '7u80'
         $release_minor = 'b15'
-        $install_path = "${java_se}1.7.0_80"
+        $install_path  = "${java_se}1.7.0_80"
         $release_hash  = undef
       }
       '8' : {
         $release_major = '8u192'
         $release_minor = 'b12'
-        $install_path = "${java_se}1.8.0_192"
+        $install_path  = "${java_se}1.8.0_192"
         $release_hash  = '750e1c8617c5452694857ad95c3ee230'
+      }
+      '11': {
+        $release_major = '11.01'
+        $release_minor = '13'
+        $install_path  = "${java_se}-11.0.1"
+        $release_hash  = '90cf5d8f270a4347a95050320eef3fb7'
       }
       default : {
         $release_major = '8u192'
         $release_minor = 'b12'
-        $install_path = "${java_se}1.8.0_192"
+        $install_path  = "${java_se}1.8.0_192"
         $release_hash  = '750e1c8617c5452694857ad95c3ee230'
       }
     }
@@ -184,7 +194,7 @@ define java::oracle (
             $package_type = 'rpm'
           }
           if $release_major =~ /(\d+)u(\d+)/ {
-	        if ($1 == '8' and Integer($2) >= 172) {
+            if ($1 == '8' and Integer($2) >= 172) {
               $path_suffix = $facts['os']['architecture'] ? {
                 'x86_64' => '-amd64',
                 default  => "-${facts['os']['architecture']}"
@@ -228,11 +238,11 @@ define java::oracle (
   }
 
   # following are based on this example:
-  # http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jre-7u80-linux-i586.rpm
+  # https://download.oracle.com/otn-pub/java/jdk/7u80-b15/jre-7u80-linux-i586.rpm
   #
   # JaveSE 6 distributed in .bin format
-  # http://download.oracle.com/otn-pub/java/jdk/6u45-b06/jdk-6u45-linux-i586-rpm.bin
-  # http://download.oracle.com/otn-pub/java/jdk/6u45-b06/jdk-6u45-linux-i586.bin
+  # https://download.oracle.com/otn-pub/java/jdk/6u45-b06/jdk-6u45-linux-i586-rpm.bin
+  # https://download.oracle.com/otn-pub/java/jdk/6u45-b06/jdk-6u45-linux-i586.bin
   # package name to download from Oracle's website
   case $package_type {
     'bin' : {
@@ -257,10 +267,14 @@ define java::oracle (
     $source = $url
   }
   elsif $release_hash != undef {
-    $source = "${oracle_url}/${release_major}-${release_minor}/${release_hash}/${package_name}"
+    if ($version == '11') {
+      $source = "${oracle_url}${release_major}+${release_minor}/${release_hash}/${package_name}"
+    } else {
+      $source = "${oracle_url}${release_major}-${release_minor}/${release_hash}/${package_name}"
+    }
   }
   else {
-    $source = "${oracle_url}/${release_major}-${release_minor}/${package_name}"
+    $source = "${oracle_url}${release_major}-${release_minor}/${package_name}"
   }
 
   # full path to the installer
@@ -290,7 +304,7 @@ define java::oracle (
       archive { $destination :
         ensure       => present,
         source       => $source,
-        cookie       => 'gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie',
+        cookie       => 'gpw_e24=https%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie',
         extract_path => '/tmp',
         cleanup      => false,
         creates      => $creates_path,
@@ -324,7 +338,7 @@ define java::oracle (
             }
             archive { "/tmp/jce-${version}.zip":
               source        => $jce_download,
-              cookie        => 'gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie',
+              cookie        => 'gpw_e24=https%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie',
               extract       => true,
               extract_path  => $jce_path,
               extract_flags => '-oj',
